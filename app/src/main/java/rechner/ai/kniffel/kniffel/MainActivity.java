@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
     Button Wurfeln;
     static DecimalFormat df = new DecimalFormat("0.00");
 
-    private static final String File_Name = "gameplan.txt";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -324,48 +324,51 @@ public class MainActivity extends AppCompatActivity {
                     }
 
 
-            gameAcitve = true;
+                    gameAcitve = true;
 
 
 
-            String json;
-            SharedPreferences pref = getApplicationContext().getSharedPreferences("Kniffel", 0); // 0 - for private mode
-            pref = getApplicationContext().getSharedPreferences("Kniffel", 0);
-            SharedPreferences.Editor editor = pref.edit();
-
-            editor.putString("GamePlan", json);
-            editor.apply();
-
-
-            decision = 0;
-            currentstate = new State(0);
-            currentMove = new Move(currentstate, gamePlan);
+                    String json;
+                    SharedPreferences pref = getApplicationContext().getSharedPreferences("Kniffel", 0); // 0 - for private mode
+                    pref = getApplicationContext().getSharedPreferences("Kniffel", 0);
+                    SharedPreferences.Editor editor = pref.edit();
+                    Gson gson = new Gson();
+                    json = gson.toJson(gamePlan);
 
 
-            runOnUiThread(new Runnable() {
-                public void run() {
-                    HorizontalprogressBar.setVisibility(View.GONE);
-                    ProgressText.setVisibility(View.GONE);
-                    CyclicProgressbar.setVisibility(View.GONE);
-                    Summe.setText(Float.toString(gesammtsumme));
-                    Wurfeln.setVisibility(View.VISIBLE);
-
-                    for (int i = 0; i < Dices.length; i++) {
-                        Dices[i].setVisibility(View.VISIBLE);
-                    }
+                    editor.putString("GamePlan", json);
+                    editor.apply();
 
 
-                    for (int i = 0; i < Labels.length; i++) {
-                        Labels[i].setVisibility(View.VISIBLE);
-                    }
+                    decision = 0;
+                    currentstate = new State(0);
+                    currentMove = new Move(currentstate, gamePlan);
+
+
+                    runOnUiThread(new Runnable() {
+                        public void run() {
+                            HorizontalprogressBar.setVisibility(View.GONE);
+                            ProgressText.setVisibility(View.GONE);
+                            CyclicProgressbar.setVisibility(View.GONE);
+                            Summe.setText(Float.toString(gesammtsumme));
+                            Wurfeln.setVisibility(View.VISIBLE);
+
+                            for (int i = 0; i < Dices.length; i++) {
+                                Dices[i].setVisibility(View.VISIBLE);
+                            }
+
+
+                            for (int i = 0; i < Labels.length; i++) {
+                                Labels[i].setVisibility(View.VISIBLE);
+                            }
+
+
+                        }
+                    });
 
 
                 }
             });
-
-
-        }
-    });
 
 
 
@@ -706,7 +709,7 @@ public class MainActivity extends AppCompatActivity {
                             MainButton.setText("gr. Straße");
                             break;
                         case 11:
-                            MainButton.setText("KNIFFEL!!");
+                            MainButton.setText("Kniffel");
                             break;
                         case 12:
                             MainButton.setText("Chance");
