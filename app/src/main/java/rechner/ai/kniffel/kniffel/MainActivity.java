@@ -1,8 +1,10 @@
 package rechner.ai.kniffel.kniffel;
 
 import android.content.SharedPreferences;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.renderscript.ScriptGroup;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.WindowManager;
@@ -10,6 +12,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -36,11 +39,12 @@ public class MainActivity extends AppCompatActivity {
     float[] gamePlan;
     Move currentMove;
     ImageView[] Dices = new ImageView[5];
+    ImageView[] buttons = new ImageView[6];
     TextView[] ShownState = new TextView[13];
     TextView[] Labels = new TextView[14];
     TextView Bonus;
     int[] ActiveDiceImages = new int[7];
-    int[] UnactiveDiceImages = new int[6];
+    int[] UnactiveDiceImages = new int[7];
     int[] InputDices = new int[5];
     int[] DiceValues = new int[6];
     boolean[] activeDice = new boolean[5];
@@ -49,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     static ArrayList<Integer>[] generallProbabiltiesInt;
     static ArrayList<Float>[] generallProbabiltiesFloat;
     static ArrayList<Integer>[] genereallOptions;
+    int nextDice = 0;
 
     Button MainButton;
     State currentstate;
@@ -94,12 +99,21 @@ public class MainActivity extends AppCompatActivity {
 
         bonus = false;
 
-        UnactiveDiceImages[0] = R.drawable.unactive1;
-        UnactiveDiceImages[1] = R.drawable.unactive2;
+
+        UnactiveDiceImages[0] = R.drawable.unactiveclear;
+        UnactiveDiceImages[1] = R.drawable.unactive1;
+        UnactiveDiceImages[2] = R.drawable.unactive2;
         UnactiveDiceImages[2] = R.drawable.unactive3;
-        UnactiveDiceImages[3] = R.drawable.unactive4;
-        UnactiveDiceImages[4] = R.drawable.unactive5;
-        UnactiveDiceImages[5] = R.drawable.unactive6;
+        UnactiveDiceImages[4] = R.drawable.unactive4;
+        UnactiveDiceImages[5] = R.drawable.unactive5;
+        UnactiveDiceImages[6] = R.drawable.unactive6;
+
+        buttons[0] = findViewById(R.id.diceButton1);
+        buttons[1] = findViewById(R.id.diceButton2);
+        buttons[2] = findViewById(R.id.diceButton3);
+        buttons[3] = findViewById(R.id.diceButton4);
+        buttons[4] = findViewById(R.id.diceButton5);
+        buttons[5] = findViewById(R.id.diceButton6);
 
         ShownState[0] = findViewById(R.id.one);
         ShownState[1] = findViewById(R.id.two);
@@ -330,7 +344,6 @@ public class MainActivity extends AppCompatActivity {
 
                     String json;
                     SharedPreferences pref = getApplicationContext().getSharedPreferences("Kniffel", 0); // 0 - for private mode
-                    pref = getApplicationContext().getSharedPreferences("Kniffel", 0);
                     SharedPreferences.Editor editor = pref.edit();
                     Gson gson = new Gson();
                     json = gson.toJson(gamePlan);
@@ -352,6 +365,11 @@ public class MainActivity extends AppCompatActivity {
                             CyclicProgressbar.setVisibility(View.GONE);
                             Summe.setText(Float.toString(gesammtsumme));
                             Wurfeln.setVisibility(View.VISIBLE);
+
+                            for (int i = 0; i < buttons.length; i++) {
+                                buttons[i].setVisibility(View.VISIBLE);
+                            }
+
 
                             for (int i = 0; i < Dices.length; i++) {
                                 Dices[i].setVisibility(View.VISIBLE);
@@ -384,6 +402,7 @@ public class MainActivity extends AppCompatActivity {
             currentstate = new State(0);
             currentMove = new Move(currentstate, gamePlan);
             Summe.setText(Float.toString(gesammtsumme));
+            Blink();
         }
 
 
@@ -438,6 +457,45 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+        buttons[0].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonClick(0);
+            }
+        });
+
+        buttons[1].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonClick(1);
+            }
+        });
+        buttons[2].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonClick(2);
+            }
+        });
+        buttons[3].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonClick(3);
+            }
+        });
+        buttons[4].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonClick(4);
+            }
+        });
+        buttons[5].setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                buttonClick(5);
+            }
+        });
+
+
         MainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -457,7 +515,6 @@ public class MainActivity extends AppCompatActivity {
                         Summe.setText(Float.toString(gesammtsumme));
                         freieFelder = 13;
                     } else {
-
 
                         decision++;
                         diceClick(0, false);
@@ -596,6 +653,7 @@ public class MainActivity extends AppCompatActivity {
                                 }
 
 
+
                                 currentMove = new Move(currentstate, gamePlan);
                                 for (int i = 0; i < InputDices.length; i++) {
                                     InputDices[i] = 0;
@@ -604,6 +662,7 @@ public class MainActivity extends AppCompatActivity {
 
                                 MainButton.setVisibility(View.INVISIBLE);
                                 Wurfeln.setVisibility(View.VISIBLE);
+
 
 
                                 decision = 0;
@@ -633,7 +692,7 @@ public class MainActivity extends AppCompatActivity {
         boolean noDiceActive = true;
         for (int i = 0; i < Dices.length; i++) {
             if (InputDices[i] > 0) {
-                Dices[i].setImageResource(UnactiveDiceImages[InputDices[i] - 1]);
+                Dices[i].setImageResource(UnactiveDiceImages[InputDices[i]]);
                 activeDice[i] = false;
             } else {
                 Dices[i].setImageResource(ActiveDiceImages[0]);
@@ -646,7 +705,10 @@ public class MainActivity extends AppCompatActivity {
         if (noDiceActive) {
             decision = 2;
             diceClick(0, false);
+        } else {
+            Blink();
         }
+
     }
 
 
@@ -654,8 +716,8 @@ public class MainActivity extends AppCompatActivity {
         if ((activeDice[pPosition] && gameAcitve) || !pRealClick) {
             if (pRealClick) {
                 InputDices[pPosition] = (InputDices[pPosition] % 6) + 1;
-                Dices[pPosition].setImageResource(ActiveDiceImages[InputDices[pPosition]]);
             }
+            Dices[pPosition].setImageResource(ActiveDiceImages[InputDices[pPosition]]);
 
             boolean allDiceselected = true;
             MainButton.setVisibility(View.VISIBLE);
@@ -663,6 +725,7 @@ public class MainActivity extends AppCompatActivity {
             for (int i = 0; i < InputDices.length; i++) {
                 if (InputDices[i] == 0) {
                     MainButton.setVisibility(View.INVISIBLE);
+
                     allDiceselected = false;
                     if (decision < 2) {
                         MainButton.setText("wegnehmen");
@@ -839,6 +902,104 @@ public class MainActivity extends AppCompatActivity {
             val *= i;
         }
         return val;
+    }
+
+
+    public void Blink() {
+
+
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+
+                nextDice = 0;
+
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        for (int i = 0; i < buttons.length; i++) {
+                            buttons[i].setVisibility(View.VISIBLE);
+                        }
+                    }
+                });
+
+
+                while (true) {
+
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    if (InputDices[nextDice] > 0) {
+                        nextDice = 0;
+                        boolean allDice = true;
+                        for (int i = 0; i < InputDices.length; i++) {
+                            if (InputDices[i] == 0) {
+                                allDice = false;
+                                break;
+                            }
+                            nextDice++;
+                        }
+                        if (allDice) {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    for (int i = 0; i < buttons.length; i++) {
+                                        buttons[i].setVisibility(View.GONE);
+                                    }
+                                }
+                            });
+
+                            break;
+                        }
+                    }
+
+
+                    Dices[nextDice].setImageResource(R.drawable.unactiveclear);
+
+
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+
+                    if (InputDices[nextDice] > 0) {
+                        nextDice = 0;
+                        boolean allDice = true;
+                        for (int i = 0; i < InputDices.length; i++) {
+                            if (InputDices[i] == 0) {
+                                allDice = false;
+                                break;
+                            }
+                            nextDice++;
+                        }
+                        if (allDice) {
+                            runOnUiThread(new Runnable() {
+                                public void run() {
+                                    for (int i = 0; i < buttons.length; i++) {
+                                        buttons[i].setVisibility(View.GONE);
+                                    }
+                                }
+                            });
+                            break;
+                        }
+                    }
+                    Dices[nextDice].setImageResource(R.drawable.clear);
+                }
+
+
+            }
+
+
+        });
+    }
+
+
+    public void buttonClick(int button) {
+        InputDices[nextDice] = button + 1;
+        diceClick(nextDice, false);
     }
 
 
